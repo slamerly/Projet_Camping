@@ -1,16 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
+/* Authors: Steven Lamerly
+ * Description:
+ */
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    // Start is called before the first frame update
+    private GameObject target;
+
     void Start()
     {
-        
+        target = GameObject.FindGameObjectWithTag("Player");
     }
 
-    // Update is called once per frame
     void Update()
     {
         
