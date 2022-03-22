@@ -7,11 +7,13 @@ using UnityEngine.AI;
 public class EnemyController : MonoBehaviour
 {
     public float rangeLook = 5f;
-    
+    public float distance;
+    public NavMeshAgent agent;
+
     private GameObject target;
-    private NavMeshAgent agent;
     private Enemy enemy;
     private GameObject[] bushes;
+    private GameObject[] brambles;
     private GameObject bushDespawn;
     private float distanceBush; //distance between enemy and bush
     private float mostShortDistanceBush; //most short distance between enemy and bush
@@ -22,34 +24,39 @@ public class EnemyController : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         enemy = GetComponent<Enemy>();
         bushes = GameObject.FindGameObjectsWithTag("Bush");
+        brambles = GameObject.FindGameObjectsWithTag("Bramble");
         bushDespawn = bushes[0];
         mostShortDistanceBush = Vector3.Distance(bushes[0].transform.position, transform.position);
     }
 
     void Update()
     {
-        float distance = Vector3.Distance(target.transform.position, transform.position);
-        if(distance <= rangeLook)
+        if(target != null)
         {
-            agent.SetDestination(target.transform.position);
-            if(distance <= agent.stoppingDistance)
+            distance = Vector3.Distance(target.transform.position, transform.position);
+            //Debug.Log(target.GetComponent<Player>().mostShortDistanceBramble);
+            if (distance <= rangeLook)
             {
-                //Attack
+                agent.SetDestination(target.transform.position);
+                // Attack Player
+                if (distance <= agent.stoppingDistance)
+                {
+                    StartCoroutine(enemy.Attack());
+                }
+                FaceTarget(target.transform);
             }
-            FaceTarget(target.transform);
-        }
 
-        //Retreat
-        if (enemy.retreat == true)
-        {
-            FindDestinationToDespawn();
-            if (mostShortDistanceBush <= agent.stoppingDistance)
+            //Retreat
+            if (enemy.retreat == true)
             {
-                //Despawn
-                Destroy(gameObject);
+                FindDestinationToDespawn();
+                if (mostShortDistanceBush <= agent.stoppingDistance)
+                {
+                    //Despawn
+                    Destroy(gameObject);
+                }
             }
         }
-
     }
 
     void FaceTarget(Transform target)

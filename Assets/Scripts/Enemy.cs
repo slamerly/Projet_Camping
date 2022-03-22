@@ -2,35 +2,39 @@
  * Description: 
  */
 using UnityEngine;
+using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
     public GameObject player;
-    public int damage = 5;
     public bool retreat = false;
+    public bool burning = false;
+    public float delayBeforeAttack = 3f;
 
-    private 
-    void Start()
+    private void Update()
     {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
-    void Attack()
-    {
-        /*
-        if(player.life > 0)
+        if (burning)
         {
-            player.life -= damage;
+            StartCoroutine(Burn());
         }
+    }
+
+    public IEnumerator Attack()
+    {
+        GetComponent<EnemyController>().agent.isStopped = true;
+        yield return new WaitForSeconds(delayBeforeAttack);
+        //Attack anim
+        if (player != null && GetComponent<EnemyController>().distance <= GetComponent<EnemyController>().agent.stoppingDistance)
+            player.GetComponent<Player>().Die();
         else
-        {
-            player.Die();
-        }
-        */
+            GetComponent<EnemyController>().agent.isStopped = false;
+    }
+
+    public IEnumerator Burn()
+    {
+        yield return new WaitForSeconds(delayBeforeAttack);
+        //Burning anim
+        player.GetComponent<Player>().mostShortDistanceBramble = player.GetComponent<Player>().mostShortDistanceWolf + 1; // permet de d'avoir une valeur supérieur au cas ou il n'y aurait plus de buisson
+        Destroy(gameObject);
     }
 }
