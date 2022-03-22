@@ -7,6 +7,7 @@ public class Enemy : MonoBehaviour
 {
     public GameObject player;
     public int damage = 5;
+    public bool retreat = false;
 
     private 
     void Start()
@@ -32,15 +33,4 @@ public class Enemy : MonoBehaviour
         }
         */
     }
-
-    /*bool Retreat()
-    {
-
-        if (player.Attack())
-        {
-            return true;
-        }
-        return false;
-    }
-    */
 }

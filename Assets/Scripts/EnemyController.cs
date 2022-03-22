@@ -1,7 +1,6 @@
 /* Authors: Steven Lamerly
  * Description:
  */
-
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,27 +8,48 @@ public class EnemyController : MonoBehaviour
 {
     public float rangeLook = 5f;
     
-    private Transform target;
+    private GameObject target;
     private NavMeshAgent agent;
+    private Enemy enemy;
+    private GameObject[] bushes;
+    private GameObject bushDespawn;
+    private float distanceBush; //distance between enemy and bush
+    private float mostShortDistanceBush; //most short distance between enemy and bush
 
     void Start()
     {
-        target = GameObject.FindGameObjectWithTag("Player").transform;
+        target = GameObject.FindGameObjectWithTag("Player");
         agent = GetComponent<NavMeshAgent>();
+        enemy = GetComponent<Enemy>();
+        bushes = GameObject.FindGameObjectsWithTag("Bush");
+        bushDespawn = bushes[0];
+        mostShortDistanceBush = Vector3.Distance(bushes[0].transform.position, transform.position);
     }
 
     void Update()
     {
-        float distance = Vector3.Distance(target.position, transform.position);
+        float distance = Vector3.Distance(target.transform.position, transform.position);
         if(distance <= rangeLook)
         {
-            agent.SetDestination(target.position);
+            agent.SetDestination(target.transform.position);
             if(distance <= agent.stoppingDistance)
             {
-                //attack
+                //Attack
             }
-            FaceTarget(target);
+            FaceTarget(target.transform);
         }
+
+        //Retreat
+        if (enemy.retreat == true)
+        {
+            FindDestinationToDespawn();
+            if (mostShortDistanceBush <= agent.stoppingDistance)
+            {
+                //Despawn
+                Destroy(gameObject);
+            }
+        }
+
     }
 
     void FaceTarget(Transform target)
@@ -39,9 +59,18 @@ public class EnemyController : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime);
     }
 
-    void OnDrawGizmosSelected()
+    void FindDestinationToDespawn()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, rangeLook);
+        foreach (GameObject bush in bushes)
+        {
+            distanceBush = Vector3.Distance(bush.transform.position, transform.position);
+
+            if (distanceBush < mostShortDistanceBush)
+            {
+                mostShortDistanceBush = distanceBush;
+                bushDespawn = bush;
+            }
+        }
+        target = bushDespawn;
     }
 }
