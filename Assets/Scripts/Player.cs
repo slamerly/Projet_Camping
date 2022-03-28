@@ -26,6 +26,7 @@ public class Player : MonoBehaviour
         brambles = GameObject.FindGameObjectsWithTag("Bramble");
         nbWolfes = wolfes.Length;
         nbBrambles = brambles.Length;
+        //Debug.Log("nbBrambles : " + nbBrambles);
         if(nbWolfes > 0)
         {
             wolfSelected = wolfes[0];
@@ -43,17 +44,20 @@ public class Player : MonoBehaviour
         SelectWolf();
         SelectBramble();
 
+        //Debug.Log("mostShortDistanceBramble : " + mostShortDistanceBramble);
+
         // Wolf enter in attack area of the player
         if (mostShortDistanceWolf <= rangeAttack && nbWolfes > 0)
         {
             if (Input.GetButton("Fire1") && Time.time >= delayAttack)
             {
-            Debug.Log("ATTACK");
+                Debug.Log("ATTACK");
+                Debug.Log(mostShortDistanceBramble);
                 delayAttack = Time.time / attackRate;
                 Attack();
             }
         }
-        else if (mostShortDistanceBramble <= rangeAttack && nbBrambles > 0)
+        if (mostShortDistanceBramble <= rangeAttack && nbBrambles > 0)
         {
             if (Input.GetButton("Fire1") && Time.time >= delayAttack)
             {
@@ -124,6 +128,10 @@ public class Player : MonoBehaviour
                     brambleSelected = bramble;
                 }
             }
+        }
+        else
+        {
+            mostShortDistanceBramble = mostShortDistanceWolf + 1;
         }
     }
 

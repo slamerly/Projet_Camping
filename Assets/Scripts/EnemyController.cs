@@ -10,13 +10,14 @@ public class EnemyController : MonoBehaviour
     public float distance;
     public NavMeshAgent agent;
 
-    private GameObject target;
     private Enemy enemy;
-    private GameObject[] bushes;
-    private GameObject[] brambles;
+    private GameObject target;
     private GameObject bushDespawn;
+    private GameObject[] bushes;
     private float distanceBush; //distance between enemy and bush
     private float mostShortDistanceBush; //most short distance between enemy and bush
+    private float bramble; //most short distance between enemy and bush
+
 
     void Start()
     {
@@ -24,7 +25,6 @@ public class EnemyController : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         enemy = GetComponent<Enemy>();
         bushes = GameObject.FindGameObjectsWithTag("Bush");
-        brambles = GameObject.FindGameObjectsWithTag("Bramble");
         bushDespawn = bushes[0];
         mostShortDistanceBush = Vector3.Distance(bushes[0].transform.position, transform.position);
     }
@@ -33,17 +33,23 @@ public class EnemyController : MonoBehaviour
     {
         if(target != null)
         {
-            distance = Vector3.Distance(target.transform.position, transform.position);
-            //Debug.Log(target.GetComponent<Player>().mostShortDistanceBramble);
-            if (distance <= rangeLook)
+            if (target == GameObject.FindGameObjectWithTag("Player"))
             {
-                agent.SetDestination(target.transform.position);
-                // Attack Player
-                if (distance <= agent.stoppingDistance)
+                distance = Vector3.Distance(target.transform.position, transform.position);
+                bramble = target.GetComponent<Player>().mostShortDistanceBramble;
+                if (distance < bramble)
                 {
-                    StartCoroutine(enemy.Attack());
+                    if (distance <= rangeLook)
+                    {
+                        agent.SetDestination(target.transform.position);
+                        // Attack Player
+                        if (distance <= agent.stoppingDistance && !enemy.retreat)
+                        {
+                            StartCoroutine(enemy.Attack());
+                        }
+                        FaceTarget(target.transform);
+                    }
                 }
-                FaceTarget(target.transform);
             }
 
             //Retreat
@@ -79,5 +85,6 @@ public class EnemyController : MonoBehaviour
             }
         }
         target = bushDespawn;
+        agent.SetDestination(target.transform.position);
     }
 }
