@@ -8,6 +8,7 @@ public class EnemyController : MonoBehaviour
 {
     public float rangeLook = 5f;
     public float distance;
+    public float timeBeforeReturnToAttack = 3f;
     public NavMeshAgent agent;
 
     private Enemy enemy;
@@ -16,7 +17,7 @@ public class EnemyController : MonoBehaviour
     private GameObject[] bushes;
     private float distanceBush; //distance between enemy and bush
     private float mostShortDistanceBush; //most short distance between enemy and bush
-    private float bramble; //most short distance between enemy and bush
+    private float timerBeforeReturn;
 
 
     void Start()
@@ -27,6 +28,7 @@ public class EnemyController : MonoBehaviour
         bushes = GameObject.FindGameObjectsWithTag("Bush");
         bushDespawn = bushes[0];
         mostShortDistanceBush = Vector3.Distance(bushes[0].transform.position, transform.position);
+        timerBeforeReturn = 3 + timeBeforeReturnToAttack;
     }
 
     void Update()
@@ -36,8 +38,7 @@ public class EnemyController : MonoBehaviour
             if (target == GameObject.FindGameObjectWithTag("Player"))
             {
                 distance = Vector3.Distance(target.transform.position, transform.position);
-                bramble = target.GetComponent<Player>().mostShortDistanceBramble;
-                if (distance < bramble)
+                if (distance < target.GetComponent<Player>().mostShortDistanceBramble)
                 {
                     if (distance <= rangeLook)
                     {
@@ -53,15 +54,7 @@ public class EnemyController : MonoBehaviour
             }
 
             //Retreat
-            if (enemy.retreat == true)
-            {
-                FindDestinationToDespawn();
-                if (mostShortDistanceBush <= agent.stoppingDistance)
-                {
-                    //Despawn
-                    Destroy(gameObject);
-                }
-            }
+            Retreat();
         }
     }
 
@@ -86,5 +79,30 @@ public class EnemyController : MonoBehaviour
         }
         target = bushDespawn;
         agent.SetDestination(target.transform.position);
+    }
+
+    void Retreat()
+    {
+        if (enemy.retreat == true)
+        {
+            FindDestinationToDespawn();
+            timerBeforeReturn -= Time.deltaTime;
+            //Debug.Log(timerBeforeReturn);
+            if (timerBeforeReturn > 0)
+            {
+                if (mostShortDistanceBush <= agent.stoppingDistance)
+                {
+                    //Despawn
+                    Destroy(gameObject);
+                    mostShortDistanceBush = 100000;
+                }
+            }
+            else
+            {
+                timerBeforeReturn = 3 + timeBeforeReturnToAttack;
+                enemy.retreat = false;
+                target = GameObject.FindGameObjectWithTag("Player");
+            }
+        }
     }
 }

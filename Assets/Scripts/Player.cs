@@ -12,21 +12,21 @@ public class Player : MonoBehaviour
     public int nbBrambles = 0;
 
     private GameObject[] wolfes;
-    private GameObject wolfSelected;
     private GameObject[] brambles;
+    private GameObject wolfSelected;
     private GameObject brambleSelected;
     private float distanceWolf; //distance between player and wolf
     private float distanceBramble; //distance between player and wolf
     private float delayAttack = 0f;
     private int nbWolfes = 0;
 
-    void Start()
+    /*void Start()
     {
         wolfes = GameObject.FindGameObjectsWithTag("Wolf");
         brambles = GameObject.FindGameObjectsWithTag("Bramble");
         nbWolfes = wolfes.Length;
         nbBrambles = brambles.Length;
-        //Debug.Log("nbBrambles : " + nbBrambles);
+        Debug.Log("nbBrambles : " + nbBrambles);
         if(nbWolfes > 0)
         {
             wolfSelected = wolfes[0];
@@ -37,48 +37,31 @@ public class Player : MonoBehaviour
             brambleSelected = brambles[0];
             mostShortDistanceBramble = Vector3.Distance(brambles[0].transform.position, transform.position);
         }
-    }
+    }*/
 
     void Update()
     {
         SelectWolf();
         SelectBramble();
 
-        //Debug.Log("mostShortDistanceBramble : " + mostShortDistanceBramble);
-
         // Wolf enter in attack area of the player
         if (mostShortDistanceWolf <= rangeAttack && nbWolfes > 0)
         {
-            if (Input.GetButton("Fire1") && Time.time >= delayAttack)
+            if (Input.GetButtonDown("Fire1") && Time.time >= delayAttack)
             {
                 Debug.Log("ATTACK");
-                Debug.Log(mostShortDistanceBramble);
                 delayAttack = Time.time / attackRate;
                 Attack();
             }
         }
         if (mostShortDistanceBramble <= rangeAttack && nbBrambles > 0)
         {
-            if (Input.GetButton("Fire1") && Time.time >= delayAttack)
+            if (Input.GetButtonDown("Fire1") && Time.time >= delayAttack)
             {
                 delayAttack = Time.time / attackRate;
                 PutFire();
             }
         }
-        /*if (Input.GetButtonDown("Fire1") && Time.time >= delayAttack)
-        {
-            if (mostShortDistanceWolf <= rangeAttack && nbWolfes > 0)
-            {
-                Debug.Log("ATTACK");
-                delayAttack = Time.time / attackRate;
-                Attack();
-            }
-            else if (mostShortDistanceBramble <= rangeAttack && nbBrambles > 0)
-            {
-                delayAttack = Time.time / attackRate;
-                PutFire();
-            }
-        }*/
     }
 
     // Player attack
@@ -94,13 +77,20 @@ public class Player : MonoBehaviour
         // Put fire animation
         Debug.Log("Allumer le feu !");
         brambleSelected.GetComponent<Enemy>().burning = true;
+        Debug.Log(brambleSelected.name);
         nbBrambles--;
-        //mostShortDistanceBramble = mostShortDistanceWolf + 1; // permet de d'avoir une valeur supérieur au cas ou il n'y aurait plus de buisson
     }
 
     // Select the wolf the most of the player
     void SelectWolf()
     {
+        wolfes = GameObject.FindGameObjectsWithTag("Wolf");
+        nbWolfes = wolfes.Length;
+        if (nbWolfes > 0)
+        {
+            wolfSelected = wolfes[0];
+            mostShortDistanceWolf = Vector3.Distance(wolfes[0].transform.position, transform.position);
+        }
         if (wolfes != null && nbWolfes > 0)
         {
             foreach (GameObject wolf in wolfes)
@@ -117,6 +107,13 @@ public class Player : MonoBehaviour
 
     void SelectBramble()
     {
+        brambles = GameObject.FindGameObjectsWithTag("Bramble");
+        nbBrambles = brambles.Length;
+        if (nbBrambles > 0)
+        {
+            brambleSelected = brambles[0];
+            mostShortDistanceBramble = Vector3.Distance(brambles[0].transform.position, transform.position);
+        }
         if (brambles != null && nbBrambles > 0)
         {
             foreach (GameObject bramble in brambles)
@@ -130,9 +127,7 @@ public class Player : MonoBehaviour
             }
         }
         else
-        {
-            mostShortDistanceBramble = mostShortDistanceWolf + 1;
-        }
+            mostShortDistanceBramble = 100000;
     }
 
     // Player die

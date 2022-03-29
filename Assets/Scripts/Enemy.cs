@@ -35,7 +35,7 @@ public class Enemy : MonoBehaviour
     {
         yield return new WaitForSeconds(delayBeforeAttack);
         //Burning anim
-        player.GetComponent<Player>().mostShortDistanceBramble = player.GetComponent<Player>().mostShortDistanceWolf + 1; // permet de d'avoir une valeur supérieur au cas ou il n'y aurait plus de buisson
+        //player.GetComponent<Player>().mostShortDistanceBramble = player.GetComponent<Player>().mostShortDistanceWolf + 1; // permet de d'avoir une valeur supérieur au cas ou il n'y aurait plus de buisson
         burning = false;
         Destroy(gameObject);
     }
